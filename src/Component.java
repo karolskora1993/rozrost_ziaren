@@ -15,6 +15,8 @@ public class Component extends JComponent {
 
     private Mesh mesh;
 
+
+
     public Component(Mesh mesh){
 
         this.rectSize=800/x;
@@ -23,6 +25,9 @@ public class Component extends JComponent {
     }
 
 
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+    }
 
     public void paintComponent(Graphics g) {
         for (int i = 0; i < x; i++) {

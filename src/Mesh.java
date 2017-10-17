@@ -25,12 +25,25 @@ public class Mesh {
 
     private int randomCaR=5;
 
-    public int getRandomCaR() {
-        return randomCaR;
+
+    public int getX() {
+        return x;
     }
 
-    public void setRandomCaR(int randomCaR) {
-        this.randomCaR = randomCaR;
+    public void setX(int x) {
+        this.x = x;
+        tab = new int[x][y];
+
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+        tab = new int[x][y];
+
     }
 
     public Mesh() {
@@ -41,6 +54,13 @@ public class Mesh {
         }
     }
 
+    public Mesh(int x, int y, int[][] tab, int next_id) {
+        this.x = x;
+        this.y = y;
+        this.tab = tab;
+        this.nextId = next_id;
+    }
+
     public void clear() {
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
@@ -49,6 +69,14 @@ public class Mesh {
         }
         nextId = 1;
         System.out.println("Wyczysc");
+    }
+
+    public int[][] getTab() {
+        return tab;
+    }
+
+    public void setTab(int[][] tab) {
+        this.tab = tab;
     }
 
     public Method getMethod() {
@@ -93,12 +121,12 @@ public class Mesh {
         return tab[i][j];
     }
 
-    public void generateRand() {
+    public void generateRand(int ammount) {
         System.out.println("===============================");
 
         System.out.println("Generowanie  losowe");
 
-        int size = new Random().nextInt(20);
+        int size = new Random().nextInt(ammount);
         size += 4;
 
         System.out.println("Ilosc wylosowanych zarodkow do generowania: " + size);
@@ -119,54 +147,6 @@ public class Mesh {
         System.out.println("Wygenerowano losowe");
     }
 
-    public void generateR(int r) {
-        System.out.println("Generuje losowy rozklad z promieniem " + r);
-
-        int size = new Random().nextInt(20);
-        size += 4;
-
-        System.out.println("Ilosc wylosowanych zarodkow do generowania: " + size);
-
-        int a, b;
-        boolean dist = false;
-
-        for (int i = 0; i < size; i++) {
-            do {
-                a = new Random().nextInt(x-1);
-                b = new Random().nextInt(y-1);
-
-                for (int k = 0; k < x; k++) {
-                    for (int l = 0; l < y; l++) {
-
-                        if (tab[k][l] != 0) {
-                            if (Math.sqrt(Math.pow(a - k, 2) + Math.pow(b - l, 2)) <= r) {
-                                System.out.print(Math.sqrt(Math.pow(a - k, 2) + Math.pow(b - l, 2)));
-                                dist = true;
-                            }
-                        }
-                    }
-                }
-                System.out.println();
-
-            }
-            while ((tab[a][b] != 0) || dist);
-            tab[a][b] = getNextId();
-        }
-
-
-    }
-
-    public void generateConst(int distance) {
-
-        System.out.println("Generuje rownomierny rozklad z odstepem " + distance);
-
-        for (int i = 0; i < x; i += distance) {
-            for (int j = 0; j < y; j += distance) {
-                tab[i][j] = getNextId();
-            }
-        }
-
-    }
 
     public boolean isStarted() {
         return started;
@@ -396,7 +376,7 @@ public class Mesh {
 
                     int[][] temp = generateTempTab(i,j);
 
-                    HashMap<Integer, Integer> neighbours = new HashMap<>();
+                    HashMap<Integer, Integer> neighbours = new HashMap<Integer, Integer>();
 
                     for (int k = 0; k < 3; k++) {
                         for (int l = 0; l < 3; l++) {
@@ -472,7 +452,7 @@ public class Mesh {
                         }
                     }
 
-                    HashMap<Integer, Integer> neighbours = new HashMap<>();
+                    HashMap<Integer, Integer> neighbours = new HashMap<Integer, Integer>();
 
                     for (int k = 0; k < 2 * randomCaR + 1; k++) {
                         for (int l = 0; l < 2 * randomCaR + 1; l++) {
@@ -502,9 +482,6 @@ public class Mesh {
         tab=nextStep;
     }
 
-    private double VectorLength(int a, int b, int k , int l){
-        return Math.sqrt(Math.pow(a - k, 2) + Math.pow(b - l, 2));
-    }
 
     public boolean isFilled() {
 
@@ -525,8 +502,6 @@ public class Mesh {
         return filled;
     }
 
-    private void randCA() {
-    }
 
     public int getNextId() {
         nextId++;

@@ -1,14 +1,17 @@
+import sun.tools.jconsole.inspector.XTextField;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * Created by apple on 24.04.2016.
  */
 public class Frame extends JFrame {
 
-    public static final int WIDTH=900;
+    public static final int WIDTH=1000;
     public static final int HEIGHT=900;
 
     private Mesh mesh;
@@ -16,13 +19,16 @@ public class Frame extends JFrame {
     private Component component;
     private JPanel settingsPanel;
     JButton buttonStart;
-
+    JTextField xField;
+    JTextField yField;
 
 
     public Frame(Mesh mesh){
         this.mesh = mesh;
         initializeComponent();
     }
+
+
 
     @Override
     public void repaint() {
@@ -46,61 +52,18 @@ public class Frame extends JFrame {
 
         settingsPanel=new JPanel();
 
-        JLabel label=new JLabel("wybierz rodzaj sasiedztwa:");
-        settingsPanel.add(label);
-
-        JComboBox chooseNeighourMethod=new JComboBox(new String[]{
-                "Moore'a",
-                "Von Neumanna",
-                "Hexagonalne lewe ",
-                "Hexagonalne prawe ",
-                "Hexagonalne losowe ",
-                "Pentagonalne losowe",
-                "pseudolosowe"
-        });
-
-        chooseNeighourMethod.setSelectedIndex(0);
-        chooseNeighourMethod.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                JComboBox source=(JComboBox)e.getSource();
-                int selectedIndex=source.getSelectedIndex();
-
-                switch(selectedIndex){
-                    case 0:
-
-                        mesh.setMethod(Mesh.Method.MOORE);
-                        break;
-                    case 1:
-                        mesh.setMethod(Mesh.Method.VON_NEUMANN);
-                        break;
-                    case 2:
-                        mesh.setMethod(Mesh.Method.HEX_LEFT);
-                        break;
-                    case 3:
-                        mesh.setMethod(Mesh.Method.HEX_RIGHT);
-                        break;
-                    case 4:
-                        mesh.setMethod(Mesh.Method.HEX_RAND);
-                        break;
-                    case 5:
-                        mesh.setMethod(Mesh.Method.PENT);
-                        break;
-                    case 6: {
-                        int r=Integer.parseInt(JOptionPane.showInputDialog("Wprowadz promień"));
-                        mesh.setRandomCaR(r);
-                        mesh.setMethod(Mesh.Method.RAND_CA);
-                    }
-                        break;
-                }
-            }
-        });
-
-        settingsPanel.add(chooseNeighourMethod);
 
 
-        JButton buttonClear=new JButton("wyczyść");
+
+        xField = new JTextField(String.valueOf(mesh.getX()));
+        yField = new JTextField(String.valueOf(mesh.getX()));
+        settingsPanel.add(new JLabel("width:"));
+        settingsPanel.add(xField);
+        settingsPanel.add(new JLabel("height:"));
+        settingsPanel.add(yField);
+
+
+        JButton buttonClear=new JButton("clear");
         buttonClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -110,22 +73,6 @@ public class Frame extends JFrame {
         });
         settingsPanel.add(buttonClear);
 
-        JButton buttonPeriod=new JButton("włącz periodyczne");
-        buttonPeriod.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JButton b=(JButton)e.getSource();
-                if(Frame.this.mesh.isPeriod()) {
-                    b.setText("włącz periodyczne");
-                    Frame.this.mesh.setPeriod(false);
-                }
-                else{
-                    b.setText("wyłącz periodyczne");
-                    Frame.this.mesh.setPeriod(true);
-                }
-            }
-        });
-        settingsPanel.add(buttonPeriod);
 
         String start;
         if(mesh.isStarted())
@@ -146,50 +93,56 @@ public class Frame extends JFrame {
 
 
         JPanel genPanel=new JPanel();
-        genPanel.add(new JLabel("wygeneruj zarodki:"));
+        genPanel.add(new JLabel("generate nucleons:"));
 
-        JButton rand=new JButton("losowo");
+        JButton rand=new JButton("random");
         rand.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                mesh.generateRand();
+                int ammount=Integer.parseInt(JOptionPane.showInputDialog("number of nucleons"));
+                mesh.generateRand(ammount);
                 component.repaint();
             }
         });
 
         genPanel.add(rand);
-        JButton r=new JButton("z promieniem");
-        r.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        settingsPanel.add(genPanel);
 
-                int r=Integer.parseInt(JOptionPane.showInputDialog("Wprowadz promień"));
-                mesh.generateR(r);
-                component.repaint();;
-
+        JMenuBar menubar = new JMenuBar();
+        JMenu file = new JMenu("File");
+        JMenu micro = new JMenu("Microstructure");
+        JMenuItem imp = new JMenuItem("Import");
+        JMenuItem exp = new JMenuItem("Export");
+        imp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    Mesh new_mesh = FileHandler.importMesh(file);
+                    Frame.this.mesh = new_mesh;
+                    component.setMesh(new_mesh);
+                    component.repaint();
+                }
             }
         });
 
-        genPanel.add(r);
-
-        JButton con=new JButton("równomernie");
-        con.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                int distance=Integer.parseInt(JOptionPane.showInputDialog("Wprowadz odleglosc miedzy zarodkami"));
-                mesh.generateConst(distance);
-                component.repaint();;
-
+        exp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    FileHandler.exportMesh(file, mesh.getTab(), mesh.getX(), mesh.getY());
+                }
             }
         });
 
-        genPanel.add(con);
 
-        add(genPanel, BorderLayout.SOUTH);
-
-
+        micro.add(imp);
+        micro.add(exp);
+        file.add(micro);
+        menubar.add(file);
+        setJMenuBar(menubar);
 
     }
 
@@ -199,6 +152,8 @@ public class Frame extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e){
             JButton b=(JButton)e.getSource();
+//            mesh.setX(Integer.parseInt(xField.getText()));
+//            mesh.setY(Integer.parseInt(yField.getText()));
 
             if(Frame.this.mesh.isStarted()){
                 b.setText("START");
