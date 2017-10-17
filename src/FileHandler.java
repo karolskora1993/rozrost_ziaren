@@ -1,3 +1,5 @@
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,6 +28,29 @@ public class FileHandler {
             }
         }
 
+    }
+
+    public static void exportMeshToImage(File file, BufferedImage image) {
+
+        try {
+            ImageIO.write(image, "bmp", file);
+            System.out.println("saved");
+        }catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    public static BufferedImage importMeshFromImage(File file) {
+
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(file);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return img;
     }
 
     public static Mesh importMesh(File file) {

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 
 /**
@@ -106,14 +107,32 @@ public class Frame extends JFrame {
             }
         });
 
+
         genPanel.add(rand);
+        genPanel.add(new JLabel("generate inclusions:"));
+
+        JButton rand_inc=new JButton("random");
+        rand_inc.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int ammount=Integer.parseInt(JOptionPane.showInputDialog("number of inclusions"));
+                mesh.generateRandInc(ammount);
+                component.repaint();
+            }
+        });
+        genPanel.add(rand_inc);
+
         settingsPanel.add(genPanel);
 
         JMenuBar menubar = new JMenuBar();
         JMenu file = new JMenu("File");
         JMenu micro = new JMenu("Microstructure");
+        JMenuItem imp_bmp = new JMenuItem("Import from bmp");
         JMenuItem imp = new JMenuItem("Import");
+        JMenuItem exp_bmp = new JMenuItem("Export to bmp");
         JMenuItem exp = new JMenuItem("Export");
+
         imp.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 JFileChooser fileChooser = new JFileChooser();
@@ -123,6 +142,19 @@ public class Frame extends JFrame {
                     Frame.this.mesh = new_mesh;
                     component.setMesh(new_mesh);
                     component.repaint();
+                }
+            }
+        });
+
+        imp_bmp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    BufferedImage img = FileHandler.importMeshFromImage(file);
+                    Graphics g = component.getGraphics();
+                    Graphics2D graphics2d = (Graphics2D) g;
+                    graphics2d.drawImage(img, 0, 0, null);
                 }
             }
         });
@@ -137,9 +169,23 @@ public class Frame extends JFrame {
             }
         });
 
+        exp_bmp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                JFileChooser fileChooser = new JFileChooser();
+                if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    BufferedImage im = new BufferedImage(component.getWidth()-200, component.getHeight()-10, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D g = im.createGraphics();
+                    component.paint(g);
+                    FileHandler.exportMeshToImage(file, im);
+                }
+            }
+        });
 
         micro.add(imp);
+        micro.add(imp_bmp);
         micro.add(exp);
+        micro.add(exp_bmp);
         file.add(micro);
         menubar.add(file);
         setJMenuBar(menubar);

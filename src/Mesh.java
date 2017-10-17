@@ -1,9 +1,3 @@
-import com.sun.org.apache.xml.internal.security.utils.resolver.implementations.ResolverAnonymous;
-import com.sun.org.apache.xml.internal.serialize.Method;
-import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
-import com.sun.tools.hat.internal.util.ArraySorter;
-
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -119,6 +113,11 @@ public class Mesh {
 
     public int getId(int i, int j) {
         return tab[i][j];
+    }
+
+
+    public void generateRandInc(int ammount) {
+
     }
 
     public void generateRand(int ammount) {
